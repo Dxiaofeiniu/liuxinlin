@@ -13,6 +13,7 @@ const data = Mock.mock({
       mainImage () {
         return imageUrl[Math.floor(Math.random() * imageUrl.length)]
       }, // 随机图片url
+      type: '@integer(1, 2)', // 类型，1~3随机整数 1图片 2视频
       title: '@ctitle(8, 16)', // 中文标题，长度8~36字符
       gameName: '@ctitle(4, 8)', // 游戏名称
       userAvatar: '@image("40x40", "#333", "#fff", "avatar")', // 用户头像url

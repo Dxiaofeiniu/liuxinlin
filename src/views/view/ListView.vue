@@ -1,19 +1,22 @@
 <template>
-  <div class="list-container" @scroll.passive="handleScroll">
+  <div
+    class="list-container"
+    @scroll.passive="handleScroll"
+    @touchstart="handleTouchStart"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
+  >
     <!-- 下拉刷新提示 -->
     <div v-if="loading && currentPage === 1" class="refresh-tip">正在刷新...</div>
 
     <!-- 数据卡片 -->
     <div class="card" v-for="item in goodData" :key="item.id">
-      <!-- <img :src="item.mainImage" alt="图片" class="card-image" /> -->
-
-<template v-if="item.mainImagetype === 'video'">
-  <video :src="item.mainImage" class="card-video" controls></video>
-
-    </template>
-    <template v-else>
-      <img :src="item.mainImage" alt="图片" class="card-image" />
-    </template>
+      <template v-if="item.type === '2'">
+        <video :src="item.mainImage" class="card-video" controls></video>
+      </template>
+      <template v-else>
+        <img :src="item.mainImage" alt="图片" class="card-image" />
+      </template>
 
       <div class="title">{{ item.title }}</div>
       <div class="game-name">{{ item.gameName }}</div>
@@ -40,12 +43,16 @@ export default {
       currentPage: 1, // 当前页码
       loading: false, // 是否正在加载
       noMore: false, // 是否没有更多数据
-      total: 50 // 总数据条数
+      total: 50, // 总数据条数
+      isRefreshing: false, // 控制下拉刷新状态
+      touchStartY: 0, // 触摸起始位置
+      touchDistance: 0 // 下拉距离
     }
   },
   created () {
     this.loadData()
   },
+
   methods: {
     // 加载数据
     loadData () {
@@ -77,7 +84,18 @@ export default {
       this.goodData = []
       this.currentPage = 1
       this.noMore = false
-      this.loadData()
+      this.loading = true
+      getData()
+        .then(response => {
+          const newData = response.data.slice(0, this.pageSize)
+          this.goodData = [...newData]
+          this.currentPage++
+          this.loading = false
+        })
+        .catch(error => {
+          console.error('Error refreshing data:', error)
+          this.loading = false
+        })
     },
 
     // 上拉加载更多
@@ -89,10 +107,38 @@ export default {
       if (scrollTop + clientHeight >= scrollHeight - 10 && !this.loading && !this.noMore) {
         this.loadData()
       }
+    },
+
+    // 处理触摸开始
+    handleTouchStart (e) {
+      this.touchStartY = e.touches[0].clientY
+    },
+
+    // 处理触摸移动
+    handleTouchMove (e) {
+      const currentY = e.touches[0].clientY
+      this.touchDistance = currentY - this.touchStartY
+
+      // 判断是否下拉超过一定距离且是第一页
+      if (this.touchDistance > 50 && !this.loading && this.currentPage === 1) {
+        this.isRefreshing = true
+      }
+    },
+
+    // 处理触摸结束
+    handleTouchEnd () {
+      if (this.isRefreshing) {
+        this.refresh()
+        this.isRefreshing = false
+      }
     }
   },
   mounted () {
     window.addEventListener('scroll', this.handleScroll)
+    const container = document.querySelector('.list-container')
+    container.addEventListener('mousemove', (e) => {
+      console.log('mousemove', e)
+    })
   },
   beforeUnmount () {
     window.removeEventListener('scroll', this.handleScroll)

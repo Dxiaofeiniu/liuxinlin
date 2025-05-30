@@ -7,3 +7,7 @@ module.exports = defineConfig({
     ? '/liuxinlin/' // 替换为你的 GitHub 仓库名称（小写）
     : '/'
 })
+
+// Dxiaofeiniu
+// liuxinlin
+// https://Dxiaofeiniu.github.io/liuxinlin/

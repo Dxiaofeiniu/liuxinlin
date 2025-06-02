@@ -5,15 +5,23 @@ const imageUrl = [
   'https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800'
 ]
 
+const videoUrl = [
+  'https://www.w3schools.com/html/mov_bbb.mp4',
+  'https://www.w3schools.com/html/movie.mp4'
+]
+
 // 生成20条数据的数组
 const data = Mock.mock({
   'list|50': [
     {
       'id|+1': 1, // 自增id，从1开始
       mainImage () {
-        return imageUrl[Math.floor(Math.random() * imageUrl.length)]
-      }, // 随机图片url
-      type: '@integer(1, 2)', // 类型，1~3随机整数 1图片 2视频
+        const isVideo = Math.random() < 0.5 // 50% 概率返回视频
+        return isVideo
+          ? videoUrl[Math.floor(Math.random() * videoUrl.length)]
+          : imageUrl[Math.floor(Math.random() * imageUrl.length)]
+      },
+      type: '@integer(1, 2)', // 类型，1~2随机整数 1图片 2视频
       title: '@ctitle(8, 16)', // 中文标题，长度8~36字符
       gameName: '@ctitle(4, 8)', // 游戏名称
       userAvatar: '@image("40x40", "#333", "#fff", "avatar")', // 用户头像url

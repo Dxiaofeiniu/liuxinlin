@@ -11,7 +11,7 @@
 
     <!-- 数据卡片 -->
     <div class="card" v-for="item in goodData" :key="item.id">
-      <template v-if="item.type === '2'">
+      <template v-if="isVideo(item.mainImage)">
         <video :src="item.mainImage" class="card-video" controls></video>
       </template>
       <template v-else>
@@ -54,6 +54,10 @@ export default {
   },
 
   methods: {
+    isVideo (url) {
+      const videoExtensions = ['.mp4', '.webm', '.ogg']
+      return videoExtensions.some(ext => url.endsWith(ext))
+    },
     // 加载数据
     loadData () {
       if (this.loading || (this.currentPage * this.pageSize > this.total && this.goodData.length >= this.total)) {
@@ -161,15 +165,16 @@ export default {
 }
 
 .card {
-  break-inside: avoid; /* 避免内容溢出 */
+  break-inside: avoid;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; // 左对齐
+  align-items: flex-start;
   text-align: left;
   padding: 10px;
+  margin-bottom: 10px;
 }
 
 .card-image {
@@ -177,38 +182,50 @@ export default {
   object-fit: contain;
 }
 
-.title {
-  display: flex;
-  flex-wrap: wrap;
-  max-lines: 2;
-  overflow: hidden;
-  justify-content: start;
-  font-size: 16px;
-  font-family: 'SimHei', sans-serif; /* 黑体 */
-  font-weight: bold;
+.card-video {
   width: 100%;
-  margin-top: 5px;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 8px;
 }
 
 .game-name {
   font-size: 12px;
-  font-family: 'SimSun', serif; /* 宋体 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: hidden;
-  margin-top: 5px;
+  color: #666;
   background-color: #e8e5e5;
   border-radius: 5px;
-  padding: 3px;
+  padding: 3px 6px;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .foot {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-top: 5px;
-  font-family: 'SimSun', serif; /* 宋体 */
+  margin-top: 8px;
   font-size: 12px;
+  color: #999;
+  justify-content: space-between;
+  width: 100%;
+}
+.load-more, .refresh-tip {
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #666;
+  animation: fadeInOut 1s ease-in-out infinite alternate;
+}
+
+@keyframes fadeInOut {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
 }
 </style>
